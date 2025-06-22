@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Click Farm</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .auth-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 0 auto 30px;
+            border-bottom: 1px solid #eee;
+            max-width: 100%;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .auth-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .auth-tab.active {
+            color: var(--primary-color);
+        }
+        
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .auth-form {
+            display: none;
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+        }
+        
+        .btn-auth {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-auth:hover {
+            background: #3a5bff;
+            transform: translateY(-2px);
+        }
+        
+        .auth-footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .captcha-container {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .captcha-question {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .captcha-input {
+            width: 100px;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.1rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 0 auto;
+            display: block;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header will be loaded by includes.js -->
+    <div id="header-placeholder"></div>
+
+    <div class="invite-notice">
+        <div class="container">
+            <div class="notice-content">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <strong>ClickFarm Is Currently Invite Only!</strong>
+                    <p>Need social media or website traffic? We recommend buying instant, affordable traffic from <a href="https://smm-panel.com/" target="_blank">SMM Panel</a>, one of our approved resellers. You can also use task websites like <a href="https://www.microworkers.com/" target="_blank">Microworkers</a> or <a href="https://timebucks.com/" target="_blank">TimeBucks</a>. <a href="https://socialmarketing90.com/timebucks/" target="_blank">Here's how to set up your campaign</a>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-container" style="margin-top: 50px;">
+        <div class="auth-form" id="signup-form">
+            <div class="signup-notice" id="signup-notice">
+                <i class="fas fa-lock"></i>
+                <p>New signups are currently invite-only. Already have an account? <a href="#" id="switch-to-login">Log in here</a>.</p>
+            </div>
+        </div>
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Login</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+        </div>
+        
+        <!-- Login Form -->
+        <form id="loginForm" class="auth-form active">
+            <div class="form-group">
+                <label for="loginEmail">Email Address</label>
+                <input type="email" id="loginEmail" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" class="form-control" required>
+                <a href="#" style="display: block; text-align: right; margin-top: 5px; font-size: 0.9rem; color: #666;">
+                    Forgot password?
+                </a>
+            </div>
+            
+            <div class="captcha-container">
+                <div class="captcha-question" id="loginCaptchaQuestion"></div>
+                <input type="number" id="loginCaptcha" class="captcha-input" placeholder="?" required>
+                <div class="error-message" id="loginCaptchaError">Incorrect answer. Please try again.</div>
+            </div>
+            
+            <button type="submit" class="btn-auth">Login to Your Account</button>
+            
+            <div class="auth-footer">
+                Don't have an account? <a href="#" class="switch-tab" data-tab="signup">Sign up</a>
+            </div>
+        </form>
+        
+        <!-- Signup Form -->
+        <form id="signupForm" class="auth-form">
+            <div class="form-group">
+                <label for="signupName">Full Name</label>
+                <input type="text" id="signupName" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="signupEmail">Email Address</label>
+                <input type="email" id="signupEmail" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" class="form-control" required>
+                <small style="display: block; margin-top: 5px; color: #666;">Minimum 8 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-control" required>
+                <div class="error-message" id="passwordMatchError">Passwords do not match</div>
+            </div>
+            
+            <div class="captcha-container">
+                <div class="captcha-question" id="signupCaptchaQuestion"></div>
+                <input type="number" id="signupCaptcha" class="captcha-input" placeholder="?" required>
+                <div class="error-message" id="signupCaptchaError">Incorrect answer. Please try again.</div>
+            </div>
+            
+            <button type="submit" class="btn-auth">Create Account</button>
+            
+            <div class="auth-footer">
+                Already have an account? <a href="#" class="switch-tab" data-tab="login">Log in</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Footer will be loaded by includes.js -->
+    <div id="footer-placeholder"></div>
+
+    <script src="js/includes.js"></script>
+    <script>
+        // Generate random math captcha
+        function generateCaptcha() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const answer = num1 + num2;
+            return { question: `${num1} + ${num2}`, answer };
+        }
+        
+        // Set up captcha for login form
+        const loginCaptcha = generateCaptcha();
+        document.getElementById('loginCaptchaQuestion').textContent = `What is ${loginCaptcha.question}?`;
+        
+        // Set up captcha for signup form
+        const signupCaptcha = generateCaptcha();
+        document.getElementById('signupCaptchaQuestion').textContent = `What is ${signupCaptcha.question}?`;
+        
+        // Tab switching
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('.auth-form');
+        const signupNotice = document.getElementById('signup-notice');
+        const switchToLogin = document.getElementById('switch-to-login');
+        
+        function switchTab(tabId) {
+            // Update active tab
+            tabs.forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Show active form and hide others
+            forms.forEach(form => {
+                if (form.id === `${tabId}Form`) {
+                    form.style.display = 'block';
+                } else {
+                    form.style.display = 'none';
+                }
+            });
+            
+            // Show/hide signup notice
+            if (tabId === 'signup') {
+                signupNotice.style.display = 'flex';
+                // Disable all form inputs in signup form
+                const signupInputs = document.querySelectorAll('#signupForm input');
+                signupInputs.forEach(input => {
+                    input.disabled = true;
+                    input.placeholder = 'Signups are currently invite-only';
+                });
+            } else {
+                signupNotice.style.display = 'none';
+                // Enable all form inputs in login form
+                const loginInputs = document.querySelectorAll('#loginForm input');
+                loginInputs.forEach(input => {
+                    input.disabled = false;
+                });
+            }
+            
+            // Generate new captcha when switching tabs
+            if (tabId === 'login') {
+                const newCaptcha = generateCaptcha();
+                loginCaptcha.question = newCaptcha.question;
+                loginCaptcha.answer = newCaptcha.answer;
+                document.getElementById('loginCaptchaQuestion').textContent = `What is ${newCaptcha.question}?`;
+                document.getElementById('loginCaptcha').value = '';
+            } else {
+                const newCaptcha = generateCaptcha();
+                signupCaptcha.question = newCaptcha.question;
+                signupCaptcha.answer = newCaptcha.answer;
+                document.getElementById('signupCaptchaQuestion').textContent = `What is ${newCaptcha.question}?`;
+                document.getElementById('signupCaptcha').value = '';
+            }
+        }
+        
+        // Initialize with login form
+        switchTab('login');
+        
+        // Add click handlers for tabs
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = tab.getAttribute('data-tab');
+                switchTab(tabId);
+            });
+        });
+        
+        // Add click handler for switch to login link
+        if (switchToLogin) {
+            switchToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTab('login');
+                // Update tab active state
+                tabs.forEach(tab => {
+                    if (tab.getAttribute('data-tab') === 'login') {
+                        tab.click();
+                    }
+                });
+            });
+        }
+        
+        // Switch tabs via links
+        document.querySelectorAll('.switch-tab').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = link.getAttribute('data-tab');
+                document.querySelector(`.auth-tab[data-tab="${tabId}"]`).click();
+            });
+        });
+        
+        // Form validation
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const captchaInput = document.getElementById('loginCaptcha');
+            const captchaError = document.getElementById('loginCaptchaError');
+            
+            if (parseInt(captchaInput.value) !== loginCaptcha.answer) {
+                captchaError.style.display = 'block';
+                captchaInput.focus();
+                return false;
+            }
+            
+            // If captcha is correct, proceed with login
+            captchaError.style.display = 'none';
+            alert('Login successful!');
+            // Here you would typically submit the form to your server
+        });
+        
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordError = document.getElementById('passwordMatchError');
+            const captchaInput = document.getElementById('signupCaptcha');
+            const captchaError = document.getElementById('signupCaptchaError');
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                passwordError.style.display = 'block';
+                return false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            // Check captcha
+            if (parseInt(captchaInput.value) !== signupCaptcha.answer) {
+                captchaError.style.display = 'block';
+                captchaInput.focus();
+                return false;
+            }
+            
+            // If validation passes, proceed with signup
+            captchaError.style.display = 'none';
+            alert('Account created successfully!');
+            // Here you would typically submit the form to your server
+        });
+        
+        // Mobile menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (hamburger) {
+            hamburger.addEventListener('click', function() {
+                this.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
+    </script>
+</body>
+</html>
